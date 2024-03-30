@@ -1,0 +1,155 @@
+var currentPage = window.location.pathname.split("/").pop();
+
+function scrollToID(id) {
+    var element = document.getElementById(id);
+    if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+}
+
+function storeFormData(event) {
+    event.preventDefault();
+
+    var yourTrainerName = document.getElementById("yourTrainerName").value;
+    var yourPokemon = document.getElementById("yourPokemon").value;
+    var enemyTrainerName = document.getElementById("enemyTrainerName").value;
+    var enemyPokemon = document.getElementById("enemyPokemon").value;
+
+    localStorage.setItem("yourTrainerName", yourTrainerName);
+    localStorage.setItem("yourPokemon", yourPokemon);
+    localStorage.setItem("enemyTrainerName", enemyTrainerName);
+    localStorage.setItem("enemyPokemon", enemyPokemon);
+
+    window.location.href = "battle.html";
+}
+
+function pokemon(name, type, level, health, attack, speed, moves) {
+    this.name = name;
+    this.type = type;
+    this.level = level;
+    this.health = health;
+    this.attack = attack;
+    this.speed = speed;
+    this.moves = moves.slice(0, 4);
+}
+
+function pokemonMove(name, type, damage) {
+    this.name = name;
+    this.type = type;
+    this.damage = damage;
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    if (currentPage === "battle.html") {
+        let yourTrainerName_fight;
+        let yourPokemon_fight;
+        let enemyTrainerName_fight;
+        let enemyPokemon_fight;
+
+        var yourTrainerName = localStorage.getItem("yourTrainerName");
+        var yourPokemon = localStorage.getItem("yourPokemon");
+        var enemyTrainerName = localStorage.getItem("enemyTrainerName");
+        var enemyPokemon = localStorage.getItem("enemyPokemon");
+        var battleTitle = yourTrainerName + " vs. " + enemyTrainerName;
+
+        document.getElementById("yourTrainerNameDisplay").textContent = yourTrainerName;
+        document.getElementById("yourPokemonDisplay").textContent = yourPokemon;
+        document.getElementById("enemyTrainerNameDisplay").textContent = enemyTrainerName;
+        document.getElementById("enemyPokemonDisplay").textContent = enemyPokemon;
+        document.getElementById("battleTitleDisplay").textContent = battleTitle;
+
+        // Define moves for each Pokémon
+        var charizardMoves = [
+            new pokemonMove("Ember", "Fire", 40),
+            new pokemonMove("Fire Spin", "Fire", 35),
+            new pokemonMove("Flamethrower", "Fire", 90),
+            new pokemonMove("Dragon Claw", "Dragon", 80)
+        ];
+
+        var blastoiseMoves = [
+            new pokemonMove("Water Gun", "Water", 40),
+            new pokemonMove("Bubble", "Water", 40),
+            new pokemonMove("Hydro Pump", "Water", 110),
+            new pokemonMove("Surf", "Water", 90)
+        ];
+
+        var venusaurMoves = [
+            new pokemonMove("Vine Whip", "Grass", 45),
+            new pokemonMove("Razor Leaf", "Grass", 55),
+            new pokemonMove("Solar Beam", "Grass", 120),
+            new pokemonMove("Petal Dance", "Grass", 120)
+        ];
+
+        var electivireMoves = [
+            new pokemonMove("Quick Attack", "Electric", 40),
+            new pokemonMove("Thunder Punch", "Electric", 75),
+            new pokemonMove("Thunderbolt", "Electric", 90),
+            new pokemonMove("Thunder", "Electric", 110)
+        ];
+
+        // Based on yourPokemon or enemyPokemon, you can define different behaviors here
+        if (yourPokemon === "Venusaur") {
+            yourPokemon_fight = new pokemon("Venusaur", "Grass/Poison", 50, 187, 167, 145, venusaurMoves);
+        } else if (yourPokemon === "Charizard") {
+            yourPokemon_fight = new pokemon("Charizard", "Fire/Flying", 50, 185, 177, 167, charizardMoves);
+        } else if (yourPokemon === "Blastoise") {
+            yourPokemon_fight = new pokemon("Blastoise", "Water", 50, 186, 150, 143, blastoiseMoves);
+        } else if (yourPokemon === "Electivire"){
+            yourPokemon_fight = new pokemon("Electivire", "Electric", 50, 182, 192, 161, electivireMoves);
+        }
+
+        if (enemyPokemon === "Venusaur") {
+            enemyPokemon_fight = new pokemon("Venusaur", "Grass/Poison", 50, 187, 167, 145, venusaurMoves);
+        } else if (enemyPokemon === "Charizard") {
+            enemyPokemon_fight = new pokemon("Charizard", "Fire/Flying", 50, 185, 177, 167, charizardMoves);
+        } else if (enemyPokemon === "Blastoise") {
+            enemyPokemon_fight = new pokemon("Blastoise", "Water", 50, 186, 150, 143, blastoiseMoves);
+        } else if (enemyPokemon === "Electivire"){
+            enemyPokemon_fight = new pokemon("Electivire", "Electric", 50, 182, 192, 161, electivireMoves);
+        }
+
+        document.getElementById("yourPokemonHP").textContent = "HP: " + yourPokemon_fight.health + "/" + yourPokemon_fight.health;
+        document.getElementById("yourPokemonLevel").textContent = "Level " + yourPokemon_fight.level;
+        document.getElementById("enemyPokemonHP").textContent = "HP: " + enemyPokemon_fight.health + "/" + enemyPokemon_fight.health;
+        document.getElementById("enemyPokemonLevel").textContent = "Level " + enemyPokemon_fight.level;
+
+        document.getElementById("yourPokemonMove1").textContent = yourPokemon_fight.moves[0].name;
+        document.getElementById("yourPokemonMove2").textContent = yourPokemon_fight.moves[1].name;
+        document.getElementById("yourPokemonMove3").textContent = yourPokemon_fight.moves[2].name;
+        document.getElementById("yourPokemonMove4").textContent = yourPokemon_fight.moves[3].name;
+    }
+
+    // Function to handle selection of moves
+    function selectMove(moveId) {
+        // Deselect all buttons
+        var buttons = document.querySelectorAll('.move button');
+        buttons.forEach(function(button) {
+          button.classList.remove('selected');
+      });
+        // Select the clicked button
+        var selectedButton = document.getElementById(moveId);
+        selectedButton.classList.add('selected');
+        selectedMoveId = moveId; // Update the selected move ID
+    }
+
+    // Function to take turn
+    function takeTurn() {
+        if (selectedMoveId) {
+          // You can run your script here using the selectedMoveId
+          console.log("Taking turn with move: " + selectedMoveId);
+          // Add your script logic here
+          document.getElementById("takeTurnBtn").classList.add('clicked'); // Add 'clicked' class to indicate the button has been clicked
+          logToConsole("Taking turn with move: " + selectedMoveId); // Log to console area
+      } else {
+          alert("Please select a move before taking a turn.");
+      }
+  }
+
+    // Function to log messages to console area
+  function logToConsole(message) {
+    var consoleArea = document.getElementById("consoleArea");
+    var logMessage = document.createElement("div");
+    logMessage.textContent = message;
+    consoleArea.appendChild(logMessage);
+}
+});
